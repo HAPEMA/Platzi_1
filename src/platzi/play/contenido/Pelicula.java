@@ -45,12 +45,28 @@ public class Pelicula {
         this.disponible = true;
         this.getNumeroPremios();
     }
-    public String obtenerFichaTecnica() {
-        return titulo +
-                " (" + fechaEstreno + ")\n" +
-                "Genero: " + genero + "\n" +
-                "Calificación: " + calificacion + "/5";
+   public String obtenerFichaTecnica() {
+        String t = titulo != null ? titulo : "—";
+        if (t.length() > 30) t = t.substring(0, 27) + "...";
+        String year = (fechaEstreno != null) ? String.valueOf(fechaEstreno.getYear()) : "s.f.";
+        String g = genero != null ? genero : "—";
+        String dur = duracion > 0 ? duracion + "min" : "—";
+        String cal = (calificacion >= 0) ? String.format("⭐ %.1f/5", calificacion) : "⭐ -/5";
+        String prem;
+        try {
+            long p = parseUnsignedLong(numeroPremios);
+            if (p >= 1_000_000_000L) prem = String.format("%dB", p / 1_000_000_000L);
+            else if (p >= 1_000_000L) prem = String.format("%dM", p / 1_000_000L);
+            else if (p >= 1_000L) prem = String.format("%dk", p / 1_000L);
+            else prem = String.valueOf(p);
+        } catch (Exception e) {
+            prem = "—";
+        }
+        String dispo = disponible ? "Disponible" : "No disponible";
+        return String.format("%-30s (%s) · %s · %s · %s · 🎖%s · %s",
+                t, year, g, dur, cal, prem, dispo);
     }
+
     public void calificar(double calificacion) {
         if (calificacion >= 0 && calificacion <= 5) {
             this.calificacion = calificacion;
